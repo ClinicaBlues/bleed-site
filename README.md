@@ -30,7 +30,13 @@ tracking: { gtmId: "GTM-...", ga4Id: "G-...", metaPixelId: "...", googleAdsId: "
 
 Enquanto um link de checkout estiver vazio, o botão correspondente abre o WhatsApp com uma mensagem de inscrição (fallback seguro).
 
-## 2. Stripe — o que já está criado (conta Blues, usuária rafaellasouza7722@gmail.com)
+## 2. Pagamento
+
+**PIX é manual**, fora do Stripe: o site mostra a chave PIX (CNPJ `28.463.961/0001-51`, favorecido Clínica Blues), o valor e um botão que abre o WhatsApp +55 31 97521-9151 com a mensagem de comprovante pré-preenchida. O acesso (ebook + aula + comunidade) é liberado manualmente pelo WhatsApp após conferência. Chave e valores ficam em `config.js → pix`.
+
+**Cartão** vai para o Stripe Checkout (Payment Links abaixo). Após o pagamento, a página de obrigado pede que o aluno envie a mensagem de confirmação no WhatsApp para receber o material.
+
+### Stripe — o que já está criado (conta Blues, usuária rafaellasouza7722@gmail.com)
 
 | Objeto | ID | Link |
 |---|---|---|
@@ -43,7 +49,7 @@ Enquanto um link de checkout estiver vazio, o botão correspondente abre o Whats
 Todos redirecionam após o pagamento para `/obrigado-complete` ou `/obrigado-digital` com `?session_id={CHECKOUT_SESSION_ID}`.
 
 **Pendências verificadas na conta Stripe (06/09/2026):**
-- **PIX não está disponível** na lista de formas de pagamento da conta (ativas: Cartão, Apple Pay, Google Pay, Link, Boleto). Enquanto o PIX não for habilitado em *Configurações → Formas de pagamento*, o link de R$ 1.300 aceita cartão e boleto. Depois de habilitar, restrinja o link ao PIX (via API: `payment_method_types=["pix"]`, o painel não permite por link) ou mantenha como "à vista".
+- O link de R$ 1.300 (`plink_1UCjVaIvOAfPNkjQc13jTK00`) **não é usado pelo site** (PIX é manual) e foi desativado para evitar pagamento no cartão por R$ 1.300.
 - **Parcelamento no cartão** não aparece nas configurações; confirme em *Configurações → Formas de pagamento → Cartões → Parcelamento* (recurso para contas brasileiras). Se não estiver disponível, o link de R$ 1.477 será cobrado à vista no cartão.
 - **Tarefa "Ação necessária"**: verificar a identidade de Rafaella Silva Souza até 22/10/2026, senão os repasses (payouts) serão pausados.
 - O limite de 10 pagamentos é por link; PIX e cartão somam separadamente. Ajuste manualmente quando a turma fechar (desative o outro link).
@@ -79,20 +85,18 @@ Mapeamento Meta: `view_content`→ViewContent, `begin_checkout`→InitiateChecko
 
 Para máxima precisão do `purchase` (independente do cliente abrir a página de obrigado), configure também um **webhook do Stripe** (`checkout.session.completed`) enviando para a Conversions API da Meta / GA4 Measurement Protocol. Isso é opcional e exige um pequeno backend (Cloudflare Worker ou similar).
 
-## 4. Publicar em bleed.clinicablues.com.br
+## 4. Publicação (feita em 06/09/2026)
 
-Qualquer hospedagem estática com SSL automático serve. Sugestão (Cloudflare Pages / Netlify / Vercel):
+| Item | Onde |
+|---|---|
+| Código | GitHub `ClinicaBlues/bleed-site` (branch `main`) — https://github.com/ClinicaBlues/bleed-site |
+| Hospedagem | Vercel, time **clinica-blues** (conta supervisaobluesclinic), projeto `bleed-site` — https://bleed-site.vercel.app |
+| Domínio | https://bleed.clinicablues.com.br (Production, SSL automático) |
+| DNS (Registro.br, zona avançada) | `CNAME bleed → 7c9c3fb2c0ff5519.vercel-dns-017.com.` e `TXT _vercel → vc-domain-verify=bleed.clinicablues.com.br,0cc762b12ec137ea518d` |
 
-1. Faça upload da pasta `site/` (arrastar e soltar funciona no Netlify Drop e no Cloudflare Pages).
-2. No DNS de `clinicablues.com.br`, crie um registro **CNAME** `bleed` apontando para o host fornecido pela plataforma.
-3. Adicione o domínio personalizado `bleed.clinicablues.com.br` no painel da plataforma; o SSL é emitido automaticamente.
-4. Para as URLs limpas `/obrigado-complete` e `/obrigado-digital` (sem `.html`): Netlify e Cloudflare Pages já resolvem automaticamente. Em servidores Apache, use o `.htaccess`:
+**Para atualizar o site:** edite os arquivos, `git commit` e `git push origin main`. Se a Vercel não fizer o deploy automático (o projeto foi importado por URL, sem a integração GitHub instalada), abra o projeto na Vercel → Deployments → "Redeploy", ou instale a integração GitHub no time clinica-blues.
 
-```
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME}.html -f
-RewriteRule ^(.*)$ $1.html [L]
-```
+`vercel.json` já cuida das URLs limpas (`/obrigado-complete`, `/obrigado-digital`) e do cache dos assets.
 
 ## 5. Teste local
 
