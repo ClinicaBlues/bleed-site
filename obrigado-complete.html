@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sua preparação para o BLEED começou | BLEED Complete</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="config.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="logo" href="index.html"><i></i>BLEED <small>UMDOISTRAUMA</small></a></div></header>
+<section class="thanks">
+  <div class="bg" aria-hidden="true"></div>
+  <div class="in">
+    <div class="kicker" style="justify-content:center">BLEED Complete • Pagamento confirmado</div>
+    <h1>Sua preparação para o BLEED começou.</h1>
+    <p class="lead" style="margin:18px auto 0">Sua inscrição para a imersão foi confirmada. Falta só um passo: <strong>envie a mensagem abaixo no WhatsApp</strong> para receber o ebook, a aula online e o acesso à comunidade.</p>
+    <div class="when"><div><small>Data</small><b>03 de outubro de 2026</b></div><div><small>Local</small><b>Clínica Blues</b><span class="muted" style="font-size:12px;display:block">Belo Horizonte — MG</span></div></div>
+    <div class="btns">
+      <a class="btn big" id="btn-wa" href="#" target="_blank" rel="noopener">Enviar confirmação no WhatsApp</a>
+      <a class="btn dark big" href="index.html">Voltar ao site</a>
+    </div>
+    <p class="note">O ebook e a aula são enviados pelo WhatsApp após a conferência do pagamento (normalmente no mesmo dia útil). Os detalhes da imersão (endereço completo, horário de chegada e o que levar) chegam pela comunidade BLEED.</p>
+  </div>
+</section>
+<script>
+(function(){
+  var C=window.BLEED_CONFIG||{},W=C.whatsapp||{};
+  var q=new URLSearchParams(location.search), sid=q.get("session_id")||"";
+  var msg="Olá! Acabei de realizar o pagamento do BLEED COMPLETE (Formação + Imersão 03/10) pelo cartão, via Stripe."+(sid?"\nCódigo da compra: "+sid.slice(0,20):"")+"\n\nNome completo: \nE-mail: \n\nAguardo o ebook, a aula online e o acesso à comunidade BLEED.";
+  var wa="https://wa.me/"+W.number+"?text="+encodeURIComponent(msg);
+  var b=document.getElementById("btn-wa"); b.href=wa;
+  b.addEventListener("click",function(){ window.bleedTrack&&bleedTrack("whatsapp_click",{content_name:"thanks_complete"}); });
+  document.addEventListener("DOMContentLoaded",function(){
+    if(sessionStorage.getItem("bleed_purchase_complete"))return;
+    try{sessionStorage.setItem("bleed_purchase_complete","1")}catch(e){}
+    window.bleedTrack&&bleedTrack("purchase",{item_name:"BLEED COMPLETE",value:1477,currency:"BRL",transaction_id:sid,items:[{item_name:"BLEED COMPLETE",quantity:1}]});
+  });
+})();
+</script>
+</body>
+</html>
